@@ -24,6 +24,8 @@ project(mygame)
 
 #add raylib, and add new libraries here
 add_subdirectory(thirdParty/raylib-5.5)
+add_subdirectory(thirdParty/imgui-docking)
+add_subdirectory(thirdParty/rlImgui)
 
 # MY_SOURCES is defined to be a list of all the source files for my game 
 # DON'T ADD THE SOURCES BY HAND, they are already added with this macro
@@ -79,4 +81,5 @@ endif()
 target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/")
 
 #link raylib Library statically, link others here too
-target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE raylib_static)
+target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE raylib_static imgui rlimgui)
+
