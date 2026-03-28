@@ -36,7 +36,9 @@ add_executable("${CMAKE_PROJECT_NAME}"
 		src/gameLayer/blocks.cpp
 		src/gameLayer/blocks.h
 		src/gameLayer/gameMap.cpp
-		src/gameLayer/gameMap.h)
+		src/gameLayer/gameMap.h
+		src/gameLayer/helpers.cpp
+		src/gameLayer/helpers.h)
 
 set_property(TARGET "${CMAKE_PROJECT_NAME}" PROPERTY CXX_STANDARD 17)
 
