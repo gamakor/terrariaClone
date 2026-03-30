@@ -9,6 +9,7 @@
 #include <ostream>
 #include <raylib.h>
 #include <assetManager.h>
+#include <cmath>
 #include <gameMap.h>
 #include <helpers.h>
 
@@ -24,13 +25,29 @@ bool initGame()
 {
     assetManager.loadAll();
 
-    gameData.gameMap.create(30,10);
+    gameData.gameMap.create(30,30);
 
-    gameData.gameMap.getBlockUnsafe(0,0).type = Block::dirt;
-    gameData.gameMap.getBlockUnsafe(1,1).type = Block::grass;
-    gameData.gameMap.getBlockUnsafe(2,2).type = Block::goldBlock;
-    gameData.gameMap.getBlockUnsafe(3,3).type = Block::glass;
-    gameData.gameMap.getBlockUnsafe(4,4).type = Block::platform;
+    for (int y = 0;y < gameData.gameMap.h; y++)
+        for (int x = 0; x < gameData.gameMap.w; x++)
+        {
+            if (x % 4 == 0 && y % 4 == 0)
+            {
+                gameData.gameMap.getBlockUnsafe(x,y).type = Block::dirt;
+            }
+            else if (x % 4 ==0)
+            {
+                gameData.gameMap.getBlockUnsafe(x,y).type = Block::goldBlock;
+            }
+            else if (y % 4 == 0 )
+            {
+                gameData.gameMap.getBlockUnsafe(x,y).type = Block::rubyBlock;
+            }
+            else
+            {
+                gameData.gameMap.getBlockUnsafe(x,y).type = Block::woodPlank;
+            }
+        }
+
 
     gameData.camera.target = {0,0}; // world-space center of view
     gameData.camera.rotation = 0.f;
@@ -61,6 +78,27 @@ bool updateGame()
 
 #pragma endregion
 
+    Vector2 worldPos = GetScreenToWorld2D(GetMousePosition(), gameData.camera);
+    int blockX = (int)floor(worldPos.x);
+    int blockY = (int)floor(worldPos.y);
+
+    if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
+    {
+        auto b = gameData.gameMap.getBlockSafe(blockX,blockY);
+        if (b)
+        {
+            *b = {};
+        }
+    }
+     if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
+     {
+         auto b = gameData.gameMap.getBlockSafe(blockX,blockY);
+         if (b)
+         {
+             b->type = Block::gold;
+         }
+     }
+
     BeginMode2D(gameData.camera);
 
     for (int y = 0;y < gameData.gameMap.h; y++)
@@ -76,12 +114,22 @@ bool updateGame()
                     getTextureAtlas(b.type,0,32,32),//source
                 {(float)x,(float)y,1,1},//dest
                 {0,0},//origin top left corner
-                    0,//rotaion
+                    0,//rotation
                     WHITE//tint
                  );
 
             }
         }
+
+    DrawTexturePro(
+        assetManager.frame,
+        {0,0,(float)assetManager.frame.width,(float)assetManager.frame.height},
+        {(float)blockX,(float)blockY,1,1},
+        {0,0},
+        0.f,
+        WHITE
+        );
+
     EndMode2D();
 
     return true;
