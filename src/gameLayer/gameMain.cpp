@@ -17,6 +17,7 @@
 
 #include "randomstuff.h"
 #include "raymath.h"
+#include "worldGenerator.h"
 
 
 struct GameData
@@ -31,9 +32,10 @@ bool initGame()
 {
     assetManager.loadAll();
 
-    gameData.gameMap.create(30,30);
+    gameData.gameMap.create(900,500);
 
-    for (int y = 0;y < gameData.gameMap.h; y++)
+    generateWorld(gameData.gameMap);
+    /*for (int y = 0;y < gameData.gameMap.h; y++)
         for (int x = 0; x < gameData.gameMap.w; x++)
         {
             if (x % 4 == 0 && y % 4 == 0)
@@ -56,7 +58,7 @@ bool initGame()
                 gameData.gameMap.getBlockUnsafe(x,y).type = Block::woodPlank;
                 gameData.gameMap.getBackgroundBlockUnsafe(x,y).type = Block::woodWall;
             }
-        }
+        }*/
 
 
     gameData.camera.target = {0,0}; // world-space center of view
@@ -70,9 +72,6 @@ bool initGame()
 
 bool updateGame()
 {
-
-
-
     float deltaTime = GetFrameTime();
     if (deltaTime > 1.f/5)
     {
@@ -96,12 +95,19 @@ bool updateGame()
 #pragma endregion
 
 #pragma region camera movement
+    static float CAMERA_SPEED = 10.f;
+    if (IsKeyDown(KEY_LEFT)) gameData.camera.target.x -= CAMERA_SPEED * deltaTime;
+    if (IsKeyDown(KEY_RIGHT)) gameData.camera.target.x += CAMERA_SPEED * deltaTime;
+    if (IsKeyDown(KEY_UP)) gameData.camera.target.y -= CAMERA_SPEED * deltaTime;
+    if (IsKeyDown(KEY_DOWN)) gameData.camera.target.y += CAMERA_SPEED * deltaTime;
 
-    if (IsKeyDown(KEY_LEFT)) gameData.camera.target.x -= 3.f * deltaTime;
-    if (IsKeyDown(KEY_RIGHT)) gameData.camera.target.x += 3.f * deltaTime;
-    if (IsKeyDown(KEY_UP)) gameData.camera.target.y -= 3.f * deltaTime;
-    if (IsKeyDown(KEY_DOWN)) gameData.camera.target.y += 3.f * deltaTime;
+#pragma endregion
 
+#pragma region imGui camera
+    ImGui::Begin("camera");
+    ImGui::SliderFloat("Camera Speed",&CAMERA_SPEED,1.f,50.f);
+    ImGui::SliderFloat("Camera Zoom",&gameData.camera.zoom,1.f,100.f);
+    ImGui::End();
 #pragma endregion
 
     Vector2 worldPos = GetScreenToWorld2D(GetMousePosition(), gameData.camera);
