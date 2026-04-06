@@ -15,11 +15,16 @@ struct GameMap
     int h = 0;
 
     std::vector<Block> mapData;
+    std::vector<Block> backgroundMapData;
 
     void create(int w, int h);
 
     Block &getBlockUnsafe(int x, int y);
     Block *getBlockSafe(int x, int y);
+
+    Block &getBackgroundBlockUnsafe(int x, int y);
+
+    Block *getBackgroundBlockSafe(int x, int y);
 };
 
 #endif //MYGAME_GAMEMAP_H
