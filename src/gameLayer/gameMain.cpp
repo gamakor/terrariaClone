@@ -35,37 +35,10 @@ bool initGame()
     gameData.gameMap.create(900,500);
 
     generateWorld(gameData.gameMap);
-    /*for (int y = 0;y < gameData.gameMap.h; y++)
-        for (int x = 0; x < gameData.gameMap.w; x++)
-        {
-            if (x % 4 == 0 && y % 4 == 0)
-            {
-                gameData.gameMap.getBlockUnsafe(x,y).type = Block::dirt;
-                gameData.gameMap.getBackgroundBlockUnsafe(x,y).type = Block::dirtWall;
-            }
-            else if (x % 4 ==0)
-            {
-                gameData.gameMap.getBlockUnsafe(x,y).type = Block::goldBlock;
-                gameData.gameMap.getBackgroundBlockUnsafe(x,y).type = Block::goldBlockWall;
-            }
-            else if (y % 4 == 0 )
-            {
-                gameData.gameMap.getBlockUnsafe(x,y).type = Block::rubyBlock;
-                gameData.gameMap.getBackgroundBlockUnsafe(x,y).type = Block::rubyBlockWall;
-            }
-            else
-            {
-                gameData.gameMap.getBlockUnsafe(x,y).type = Block::woodPlank;
-                gameData.gameMap.getBackgroundBlockUnsafe(x,y).type = Block::woodWall;
-            }
-        }*/
 
-
-    gameData.camera.target = {0,0}; // world-space center of view
+    gameData.camera.target = {450,120}; // world-space center of view
     gameData.camera.rotation = 0.f;
-    gameData.camera.zoom = 100.f;
-
-
+    gameData.camera.zoom = 10.f;
 
     return true;
 }
