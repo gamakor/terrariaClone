@@ -8,10 +8,14 @@
 #include "gameMap.h"
 
 
-
-
+inline std::vector<float> dirtEndResultNoiseMap;
+inline std::vector<float> stoneEndResultNoiseMap;
 void generateWorld(GameMap &gameMap, int seed = 1234);
-int setHillSize();
-void changeHeight(bool isPastHalf);
+
+float getNoise(int blockType,int x);
+
+inline float noiseMap = 0.f;
+
+
 
 #endif //MYGAME_WORLDGENERATOR_H

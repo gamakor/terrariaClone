@@ -15,6 +15,7 @@
 #include <imgui.h>
 #include <rlImGui.h>
 
+
 #include "randomstuff.h"
 #include "raymath.h"
 #include "worldGenerator.h"
@@ -86,6 +87,13 @@ bool updateGame()
     Vector2 worldPos = GetScreenToWorld2D(GetMousePosition(), gameData.camera);
     int blockX = (int)floor(worldPos.x);
     int blockY = (int)floor(worldPos.y);
+
+#pragma region imGui block info
+    ImGui::Begin("block info");
+    auto b = gameData.gameMap.getBlockSafe(blockX,blockY);
+    ImGui::Text("Block Noise Value: %f",getNoise(b->type,blockX));
+    ImGui::End();
+#pragma endregion
 
     if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
     {
