@@ -18,10 +18,11 @@ void generateWorld(GameMap &gameMap, int seed)
 
     gameMap.create(w,h);
 
-    int stoneHeight = 120;
-    int dirtHeight = 50;
-
     std::ranlux24_base rng(seed++);
+
+    int desertStart = getRandomInt(rng,10, w -210);
+    int desertEnd = desertStart + 100+ getRandomInt(rng,0,100);
+    if (desertEnd > w){desertEnd = w;}
 
     std::unique_ptr<FastNoiseLite> dirtNoiseGenerator = std::make_unique<FastNoiseLite>();
     std::unique_ptr<FastNoiseLite> stoneNoiseGenerator = std::make_unique<FastNoiseLite>();
@@ -119,8 +120,25 @@ void generateWorld(GameMap &gameMap, int seed)
         stoneEndResultNoiseMap[x] = smoothstep(stoneEndResultNoiseMap[x]);
     }
 
+//create caves perlin noise
+    std::unique_ptr<FastNoiseLite> caveNoiseGenerator = std::make_unique<FastNoiseLite>();
 
+    caveNoiseGenerator->SetNoiseType(FastNoiseLite::NoiseType::NoiseType_Perlin);
+    caveNoiseGenerator->SetFractalOctaves(1);
+    caveNoiseGenerator->SetFrequency(.01f);
 
+    std::vector<float> caveMountainNoiseMap(w*h);
+
+    for (int x = 0; x < w; x++)
+        for (int y = 0; y < h; y++)
+        {
+            caveMountainNoiseMap[x + y*w] = caveNoiseGenerator->GetNoise((float)x, (float)y);
+        }
+
+    for (int i = 0; i < (w*h); i++)
+    {
+        caveMountainNoiseMap[i] = (caveMountainNoiseMap[i] + 1) / 2;
+    }
 
     //Not using while doing noise test
     /*int dirtDirection = getRandomInt(rng,-2,2);
@@ -139,9 +157,22 @@ void generateWorld(GameMap &gameMap, int seed)
 
     for (int x = 0;x < w; x++)
     {
+        bool inDesert = (x >= desertStart && x <= desertEnd);
+
         int stoneHeight = stoneHeightStart + (stoneHeightEnd - stoneHeightStart) * dirtEndResultNoiseMap[x];
         int dirtHeight = dirtOffsetStart + (dirtOffsetEnd - dirtOffsetStart) * stoneEndResultNoiseMap[x];
         dirtHeight = stoneHeight - dirtHeight;
+
+        int dirtType = Block::dirt;
+        int stoneType = Block::stone;
+        int grassType = Block::grassBlock;
+
+        if (inDesert)
+        {
+            dirtType = Block::sand;
+            grassType = Block::sand;
+            stoneType = Block::sandStone;
+        }
 
         for (int y = 0; y < h; y++)
         {
@@ -150,19 +181,44 @@ void generateWorld(GameMap &gameMap, int seed)
 
             if (y > dirtHeight)
             {
-                b.type = Block::dirt;
+                b.type = dirtType;
             }
             if (y == dirtHeight)
             {
-                b.type = Block::grassBlock;
+                b.type = grassType;
             }
             if (y > stoneHeight)
             {
-                b.type = Block::stone;
+                b.type = stoneType;
                 if (getRandomChance(rng,0.01))
                 {
                     b.type = Block::gold;
                 }
+            }
+            if (inDesert)
+			{
+				int desertMid = (desertStart + desertEnd) / 2;
+				int desertHalfWidth = (desertEnd - desertStart) / 2;
+				int distanceFromDesertMid = std::abs(x - desertMid);
+
+				// This gives a value from 0 at edge to 1 at center
+				float desertDistance = 1 - distanceFromDesertMid / float(desertHalfWidth);
+
+				int desertStoneStart = 10 + stoneHeight;
+				int desertStoneDepth = 20 + stoneHeight; // how deep the triangle goes
+
+				int triangleStoneY = desertStoneStart + desertDistance * desertStoneDepth;
+
+				// Apply stone if below the triangle
+				if (y > triangleStoneY)
+				{
+					b.type = Block::stone;
+				}
+			}
+
+            if (caveMountainNoiseMap[x+y*w] < 0.3f)
+            {
+                b.type = Block::air;
             }
 
             gameMap.getBlockUnsafe(x,y) = b;

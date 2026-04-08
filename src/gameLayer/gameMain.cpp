@@ -91,7 +91,8 @@ bool updateGame()
 #pragma region imGui block info
     ImGui::Begin("block info");
     auto b = gameData.gameMap.getBlockSafe(blockX,blockY);
-    ImGui::Text("Block Noise Value: %f",getNoise(b->type,blockX));
+    if (b)
+        ImGui::Text("Block Noise Value: %f",getNoise(b->type,blockX));
     ImGui::End();
 #pragma endregion
 
